@@ -18,9 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 
 const viewAllFiles = () => {
   const listOfFiles = [];
-  const filesDirectory = fs.readdirSync(
-    `node_modules/@korenezri/jsondb/backend/files/`
-  );
+  const filesDirectory = fs.readdirSync(`backend/files/`);
   filesDirectory.forEach((file) => {
     listOfFiles.push(file);
   });
@@ -47,26 +45,24 @@ app.get("/all", (req, res) => {
 
 //on GET request: if the specified ID exists, show appropriate file
 app.get("/b/:id", (req, res) => {
-  fs.readFile(
-    `node_modules/@korenezri/jsondb/backend/files/${req.params.id}.json`,
-    "utf8",
-    (err, data) => {
-      if (
-        !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-          req.params.id
-        ) &&
-        req.params.id !== "default" && req.params.id !== "users" && req.params.id !== "test"
-      ) {
-        res
-          .status(404)
-          .json(`This ID "${req.params.id}" is not a legal file-ID.`);
-      } else if (!data) {
-        res.status(400).json(`No file found by the id of ${req.params.id}`);
-      } else {
-        res.status(200).send(JSON.stringify(JSON.parse(data), null, 2));
-      }
+  fs.readFile(`backend/files/${req.params.id}.json`, "utf8", (err, data) => {
+    if (
+      !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        req.params.id
+      ) &&
+      req.params.id !== "default" &&
+      req.params.id !== "users" &&
+      req.params.id !== "test"
+    ) {
+      res
+        .status(404)
+        .json(`This ID "${req.params.id}" is not a legal file-ID.`);
+    } else if (!data) {
+      res.status(400).json(`No file found by the id of ${req.params.id}`);
+    } else {
+      res.status(200).send(JSON.stringify(JSON.parse(data), null, 2));
     }
-  );
+  });
 });
 
 //on a POST request, CREATE a new file, assign an ID to it, and show it
@@ -77,14 +73,9 @@ app.post("/", (req, res) => {
   const response = [];
   try {
     response.push(fileID);
-    fs.writeFile(
-      `node_modules/@korenezri/jsondb/backend/files/${fileID}.json`,
-      `${json}`,
-      "utf8",
-      () => {
-        res.json(`${response}`);
-      }
-    );
+    fs.writeFile(`backend/files/${fileID}.json`, `${json}`, "utf8", () => {
+      res.json(`${response}`);
+    });
   } catch {
     res.status(400).send(`ERROR!, in index.js of DB:  ${err}`);
   }
@@ -92,13 +83,13 @@ app.post("/", (req, res) => {
 
 //on PUT request: update the file according to it's id
 app.put("/b/:id", (req, res, next) => {
-  console.log('ARRIVED HERE')
   if (
     !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
       req.params.id
     ) &&
     req.params.id !== "users" &&
-    req.params.id !== "default" && req.params.id !== "test"
+    req.params.id !== "default" &&
+    req.params.id !== "test"
   ) {
     res.status(404).json(`This ID "${req.params.id}" is not a legal file-ID.`);
   }
@@ -110,14 +101,9 @@ app.put("/b/:id", (req, res, next) => {
   if (!listOffiles.includes(`${file_ID}.json`)) {
     res.status(400).json(`File ${file_ID} not found`);
   } else {
-    fs.writeFile(
-      `node_modules/@korenezri/jsondb/backend/files/${file_ID}.json`,
-      json,
-      "utf8",
-      (data) => {
-        res.status(201).send(req.body);
-      }
-    );
+    fs.writeFile(`backend/files/${file_ID}.json`, json, "utf8", (data) => {
+      res.status(201).send(req.body);
+    });
   }
 });
 
@@ -146,7 +132,5 @@ app.delete("/b/:id", (req, res) => {
 });
 
 //ROUTES END
-
-const PORT = 3001;
 
 module.exports = app;
