@@ -46,7 +46,7 @@
   "name": "@korenezri/jsondb",
   "scripts": {
     "dev": "nodemon index",
-    "start": "node index",
+    "start": "node server.js",
     "test": "jest --verbose"
   },
   "version": "8.0.0"
